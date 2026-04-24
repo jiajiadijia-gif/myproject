@@ -1,21 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>测试页面</title>
-    <style>
-        body {
-            background: #ffffff;
-            color: #000000;
-            font-size: 24px;
-            text-align: center;
-            padding-top: 100px;
-            font-family: sans-serif;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>🎵 英日学歌智能体 · 歌曲库整合版</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0e17;--s1:#1a1a2e;--s2:#232340;--s3:#2d2d50;--acc:#6c63ff;--acc2:#a78bfa;--text:#ebebeb;--text2:#9a9ab0;--text3:#6a6a80;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--cyan:#22d3ee;--pink:#f472b6;--border:#2e2e4a;--radius:12px}
+body{font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:12px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.logo{font-size:1.1em;font-weight:700;display:flex;align-items:center;gap:5px}
+.logo .hl{color:var(--acc2)}
+.speed-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:20px;font-size:.76em;cursor:pointer;transition:.2s}
+.speed-btn.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tabs{display:flex;gap:3px;overflow-x:auto}
+.tab{background:none;border:none;color:var(--text3);padding:7px 12px;border-radius:8px;font-size:.82em;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
+.tab:hover{color:var(--text2);background:var(--s2)}
+.tab.active{background:var(--acc);color:#fff}
+.main{max-width:860px;margin:0 auto;padding:12px;min-height:calc(100vh - 100px)}
+.lang-filters{display:flex;gap:5px;margin-bottom:10px}
+.lang-filter{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:.78em;cursor:pointer;transition:.2s;font-family:inherit}
+.lang-filter.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.song-grid{display:grid;gap:10px;grid-template-columns:1fr}
+.song-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+.song-card:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 6px 24px rgba(108,99,255,.15)}
+.song-card.custom{border-left:3px solid var(--yellow)}
+.song-title-card{font-size:1.05em;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.song-artist{font-size:.8em;color:var(--text2);margin-bottom:6px}
+.song-meta{display:flex;align-items:center;gap:10px;font-size:.75em;color:var(--text3)}
+.lang-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.7em;font-weight:600;margin-left:6px;vertical-align:middle}
+.lang-badge.en{background:rgba(99,102,241,.2);color:#818cf8}
+.lang-badge.ja{background:rgba(244,114,182,.2);color:var(--pink)}
+.card-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px}
+.del-card-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--red);background:rgba(248,113,113,.15);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7em;transition:.2s}
+.del-card-btn:hover{background:var(--red);color:#fff}
+</style>
 </head>
 <body>
-    我的GitHub Pages网页成功运行啦！🎉
+<!-- 这里继续粘贴你剩下的HTML和JavaScript代码 -->
 </body>
 </html>
