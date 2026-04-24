@@ -1,38 +1,762 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>🎵 英日学歌智能体 · 歌曲库整合版</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=1.5, minimum-scale=0.8">
+  <title>🎵 英日学歌智能体</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#0f0e17;--s1:#1a1a2e;--s2:#232340;--s3:#2d2d50;--acc:#6c63ff;--acc2:#a78bfa;--text:#ebebeb;--text2:#9a9ab0;--text3:#6a6a80;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--cyan:#22d3ee;--pink:#f472b6;--border:#2e2e4a;--radius:12px}
+    body{font-family:'Noto Sans SC','Noto Sans JP',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+    .header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:12px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .logo{font-size:1.1em;font-weight:700;display:flex;align-items:center;gap:5px}
+    .logo .hl{color:var(--acc2)}
+    .speed-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:20px;font-size:.76em;cursor:pointer;transition:.2s}
+    .speed-btn.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .tabs{display:flex;gap:3px;overflow-x:auto}
+    .tab{background:none;border:none;color:var(--text3);padding:7px 12px;border-radius:8px;font-size:.82em;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
+    .tab:hover{color:var(--text2);background:var(--s2)}
+    .tab.active{background:var(--acc);color:#fff}
+    .main{max-width:860px;margin:0 auto;padding:12px;min-height:calc(100vh - 100px)}
+    .lang-filters{display:flex;gap:5px;margin-bottom:10px}
+    .lang-filter{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:.78em;cursor:pointer;transition:.2s;font-family:inherit}
+    .lang-filter.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .song-grid{display:grid;gap:10px;grid-template-columns:1fr}
+    .song-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+    .song-card:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 6px 24px rgba(108,99,255,.15)}
+    .song-card.custom{border-left:3px solid var(--yellow)}
+    .song-title-card{font-size:1.05em;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+    .song-artist{font-size:.8em;color:var(--text2);margin-bottom:6px}
+    .song-meta{display:flex;align-items:center;gap:10px;font-size:.75em;color:var(--text3)}
+    .lang-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.7em;font-weight:600;margin-left:6px;vertical-align:middle}
+    .lang-badge.en{background:rgba(99,102,241,.2);color:#818cf8}
+    .lang-badge.ja{background:rgba(244,114,182,.2);color:var(--pink)}
+    .card-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px}
+    .del-card-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--red);background:rgba(248,113,113,.15);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7em;transition:.2s}
+    .del-card-btn:hover{background:var(--red);color:#fff}
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f0e17;--s1:#1a1a2e;--s2:#232340;--s3:#2d2d50;--acc:#6c63ff;--acc2:#a78bfa;--text:#ebebeb;--text2:#9a9ab0;--text3:#6a6a80;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--cyan:#22d3ee;--pink:#f472b6;--border:#2e2e4a;--radius:12px}
-body{font-family:'Noto Sans SC','Noto Sans JP',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:12px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.logo{font-size:1.1em;font-weight:700;display:flex;align-items:center;gap:5px}
-.logo .hl{color:var(--acc2)}
-.speed-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:20px;font-size:.76em;cursor:pointer;transition:.2s}
-.speed-btn.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.tabs{display:flex;gap:3px;overflow-x:auto}
-.tab{background:none;border:none;color:var(--text3);padding:7px 12px;border-radius:8px;font-size:.82em;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
-.tab:hover{color:var(--text2);background:var(--s2)}
-.tab.active{background:var(--acc);color:#fff}
-.main{max-width:860px;margin:0 auto;padding:12px;min-height:calc(100vh - 100px)}
-.lang-filters{display:flex;gap:5px;margin-bottom:10px}
-.lang-filter{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:.78em;cursor:pointer;transition:.2s;font-family:inherit}
-.lang-filter.active{background:var(--acc);color:#fff;border-color:var(--acc)}
-.song-grid{display:grid;gap:10px;grid-template-columns:1fr}
-.song-card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
-.song-card:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 6px 24px rgba(108,99,255,.15)}
-.song-card.custom{border-left:3px solid var(--yellow)}
-.song-title-card{font-size:1.05em;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
-.song-artist{font-size:.8em;color:var(--text2);margin-bottom:6px}
-.song-meta{display:flex;align-items:center;gap:10px;font-size:.75em;color:var(--text3)}
-.lang-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.7em;font-weight:600;margin-left:6px;vertical-align:middle}
-.lang-badge.en{background:rgba(99,102,241,.2);color:#818cf8}
-.lang-badge.ja{background:rgba(244,114,182,.2);color:var(--pink)}
-.card-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px}
-.del-card-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--red);background:rgba(248,113,113,.15);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7em;transition:.2s}
-.del-card-btn:hover{background:var(--red);color:#fff}
+    .lyrics-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .back-btn{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.83em;transition:.2s}
+    .back-btn:hover{border-color:var(--acc);color:var(--acc2)}
+    .lyrics-song-title{font-size:1.1em;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .lyrics-controls{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+    .ctrl-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);padding:5px 10px;border-radius:20px;font-size:.76em;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
+    .ctrl-btn:hover{border-color:var(--acc);color:var(--acc2)}
+    .ctrl-btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .save-song-btn{background:var(--green);color:#000;border:1px solid var(--green);padding:5px 12px;border-radius:20px;font-size:.76em;cursor:pointer;font-family:inherit;white-space:nowrap;font-weight:600;transition:.2s}
+    .save-song-btn:hover{background:#22c55e;border-color:#22c55e}
+
+    .lyric-line{margin-bottom:10px;padding:10px;border-radius:var(--radius);background:var(--s1);border:1px solid transparent;transition:.2s}
+    .lyric-line:hover{border-color:var(--border)}
+    .line-en{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 0;line-height:2.1}
+    .line-en.interlinear{align-items:flex-start;gap:3px 2px;line-height:1.3}
+    .word{padding:2px 4px;border-radius:6px;cursor:pointer;transition:.15s;display:inline-block;font-size:1.02em}
+    .word:hover{background:rgba(108,99,255,.2);color:var(--acc2)}
+    .word.in-vocab{border-bottom:2px solid var(--green)}
+    .word.blank{background:var(--s3);color:transparent;min-width:48px;text-align:center;border:1px dashed var(--acc);user-select:none}
+    .word.blank.revealed{color:var(--green);background:rgba(74,222,128,.1);border-color:var(--green)}
+    .wg{display:inline-flex;flex-direction:column;align-items:center;padding:4px 5px;border-radius:8px;cursor:pointer;transition:.15s;vertical-align:top;min-width:30px}
+    .wg:hover{background:rgba(108,99,255,.18)}
+    .wg.in-vocab{box-shadow:inset 0 -2px 0 var(--green)}
+    .wg-en{font-size:1em;color:#fff;font-weight:500;white-space:nowrap}
+    .wg-ph{font-size:.65em;color:var(--acc2);font-style:italic;white-space:nowrap;margin-top:1px}
+    .wg-zh{font-size:.7em;color:var(--green);white-space:nowrap;margin-top:1px}
+    .wg-unknown{color:var(--text3)}
+    .wg.blank-wg .wg-en{background:var(--s3);color:transparent;padding:0 8px;border-radius:4px;border:1px dashed var(--acc);min-width:40px}
+    .wg.blank-wg .wg-zh{color:transparent}
+    .wg.blank-wg.revealed .wg-en{color:var(--green);background:rgba(74,222,128,.1);border-color:var(--green)}
+    .wg.blank-wg.revealed .wg-zh{color:var(--green)}
+    .wg-rd{font-size:.62em;color:var(--pink);white-space:nowrap;margin-bottom:1px;font-style:normal}
+    .ja-word{font-size:1.05em}
+    .line-play{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:var(--text3);cursor:pointer;font-size:.68em;margin-right:3px;transition:.2s;flex-shrink:0}
+    .line-play:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+    .line-play.il-play{align-self:center;margin-top:4px}
+    .line-zh{font-size:.82em;color:var(--cyan);padding-left:4px;margin-top:5px;padding-top:5px;border-top:1px dashed var(--border);line-height:1.6}
+    .line-zh .label{color:var(--text3);font-size:.9em;margin-right:4px}
+
+    .word-panel{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);transform:translateY(100%);transition:.35s cubic-bezier(.4,0,.2,1);z-index:200;max-height:55vh;overflow-y:auto;border-radius:20px 20px 0 0}
+    .word-panel.open{transform:translateY(0)}
+    .wp-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:8px auto}
+    .wp-content{padding:4px 18px 24px}
+    .wp-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+    .wp-word{font-size:1.5em;font-weight:700;color:#fff}
+    .wp-phonetic{font-size:.92em;color:var(--acc2);margin-top:2px;font-style:italic}
+    .wp-reading{font-size:.92em;color:var(--pink);margin-top:2px}
+    .wp-pos{display:inline-block;background:var(--s3);color:var(--text2);padding:2px 8px;border-radius:4px;font-size:.73em;margin-top:5px}
+    .wp-meaning{font-size:1.1em;color:var(--text);margin:10px 0;padding:10px;background:var(--s2);border-radius:8px;border-left:3px solid var(--acc)}
+    .wp-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .wp-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:.83em;cursor:pointer;transition:.2s;font-family:inherit;display:flex;align-items:center;gap:4px}
+    .wp-btn:hover{border-color:var(--acc);color:var(--acc2)}
+    .wp-btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+    .wp-btn.danger{border-color:var(--red);color:var(--red)}
+    .wp-close{background:none;border:none;color:var(--text3);font-size:1.4em;cursor:pointer;padding:4px}
+
+    .custom-area{display:flex;flex-direction:column;gap:10px}
+    .custom-lang-toggle{display:flex;gap:6px;margin-bottom:2px}
+    .cl-btn{padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;font-family:inherit;font-size:.85em;transition:.2s}
+    .cl-btn.active{border-color:var(--acc);background:var(--acc);color:#fff}
+    .custom-textarea{width:100%;min-height:170px;background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:12px;color:var(--text);font-size:.92em;font-family:inherit;resize:vertical;line-height:1.8}
+    .custom-textarea::placeholder{color:var(--text3)}
+    .custom-textarea:focus{outline:none;border-color:var(--acc)}
+    .custom-submit{align-self:flex-end}
+    .format-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:.82em;line-height:1.8}
+    .format-box code{background:var(--s3);padding:2px 6px;border-radius:4px;color:var(--acc2);font-size:.92em}
+    .format-title{font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+    .format-ex{color:var(--text3);margin:4px 0;padding-left:8px;border-left:2px solid var(--border)}
+
+    .vocab-empty{text-align:center;padding:50px 20px;color:var(--text3)}
+    .vocab-empty .icon{font-size:2.8em;margin-bottom:10px;display:block}
+    .vocab-list{display:flex;flex-direction:column;gap:7px}
+    .vocab-item{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:10px}
+    .vocab-word{font-size:1.02em;font-weight:600;min-width:70px}
+    .vocab-info{flex:1;min-width:0}
+    .vocab-phonetic{font-size:.78em;color:var(--acc2);font-style:italic}
+    .vocab-reading{font-size:.78em;color:var(--pink)}
+    .vocab-meaning{font-size:.82em;color:var(--text2);margin-top:1px}
+    .vocab-actions{display:flex;gap:5px;flex-shrink:0}
+    .vocab-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.82em;transition:.2s}
+    .vocab-btn:hover{border-color:var(--acc);color:var(--acc2)}
+    .vocab-btn.del:hover{border-color:var(--red);color:var(--red)}
+    .vocab-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+    .vocab-count{font-size:.82em;color:var(--text3)}
+    .flashcard-btn{background:var(--acc);color:#fff;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.83em}
+
+    .fc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+    .fc-card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:36px 24px;text-align:center;max-width:340px;width:100%;position:relative;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+    .fc-progress{position:absolute;top:14px;right:18px;font-size:.8em;color:var(--text3)}
+    .fc-word{font-size:1.9em;font-weight:700}
+    .fc-phonetic{font-size:.95em;color:var(--acc2);font-style:italic}
+    .fc-reading{font-size:.95em;color:var(--pink)}
+    .fc-meaning{font-size:1.15em;color:var(--green);min-height:28px}
+    .fc-btns{display:flex;gap:8px;margin-top:8px}
+    .fc-btn{padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:.88em;cursor:pointer;font-family:inherit;transition:.2s}
+    .fc-btn:hover{border-color:var(--acc);color:var(--acc2)}
+    .fc-btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+    .fc-close{position:absolute;top:12px;left:14px;background:none;border:none;color:var(--text3);font-size:1.3em;cursor:pointer}
+
+    .section-title{font-size:.88em;color:var(--text3);margin-bottom:10px;padding-left:2px}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;opacity:0;pointer-events:none;transition:.3s}
+    .overlay.show{opacity:1;pointer-events:auto}
+
+    @media(min-width:520px){.song-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:600px){
+      .word-panel{left:50%;right:auto;transform:translate(-50%,100%);width:440px;border-radius:20px 20px 0 0}
+      .word-panel.open{transform:translate(-50%,0)}
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .lyric-line{animation:fadeUp .3s ease both}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="header-top">
+    <div class="logo">🎵 <span class="hl">学歌</span>智能体</div>
+    <button class="speed-btn" id="speedBtn" onclick="toggleSpeed()">🐢 慢速</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+<main class="main" id="main"></main>
+<div class="overlay" id="overlay" onclick="closeWordPanel()"></div>
+<div class="word-panel" id="wordPanel">
+  <div class="wp-handle"></div>
+  <div class="wp-content" id="wpContent"></div>
+</div>
+<script>
+  (function(){
+    // ==================== EN DICT ====================
+    const D={
+    "a":{p:"/ə/",m:"一个",s:"冠词"},"about":{p:"/əˈbaʊt/",m:"关于",s:"介词"},"above":{p:"/əˈbʌv/",m:"在…上方",s:"介词"},"again":{p:"/əˈɡen/",m:"再次",s:"副词"},"all":{p:"/ɔːl/",m:"所有的",s:"形容词"},"always":{p:"/ˈɔːlweɪz/",m:"总是",s:"副词"},"am":{p:"/æm/",m:"是(I am)",s:"动词"},"amazing":{p:"/əˈmeɪzɪŋ/",m:"令人惊叹的",s:"形容词"},"an":{p:"/ən/",m:"一个",s:"冠词"},"and":{p:"/ænd/",m:"和",s:"连词"},"appear":{p:"/əˈpɪr/",m:"出现",s:"动词"},"are":{p:"/ɑːr/",m:"是",s:"动词"},"arms":{p:"/ɑːrmz/",m:"手臂",s:"名词"},"as":{p:"/æz/",m:"像；当",s:"连词"},"at":{p:"/æt/",m:"在",s:"介词"},"away":{p:"/əˈweɪ/",m:"离开",s:"副词"},"awoke":{p:"/əˈwoʊk/",m:"醒来(过去式)",s:"动词"},
+    "baby":{p:"/ˈbeɪbi/",m:"宝贝",s:"名词"},"back":{p:"/bæk/",m:"回来",s:"副词"},"be":{p:"/biː/",m:"是",s:"动词"},"beautiful":{p:"/ˈbjuːtɪfl/",m:"美丽的",s:"形容词"},"because":{p:"/bɪˈkɔːz/",m:"因为",s:"连词"},"been":{p:"/biːn/",m:"是(过去分词)",s:"动词"},"before":{p:"/bɪˈfɔːr/",m:"在…之前",s:"介词"},"believe":{p:"/bɪˈliːv/",m:"相信",s:"动词"},"believed":{p:"/bɪˈliːvd/",m:"相信了",s:"动词"},"blind":{p:"/blaɪnd/",m:"盲的",s:"形容词"},"blazing":{p:"/ˈbleɪzɪŋ/",m:"炽热的",s:"形容词"},"blue":{p:"/bluː/",m:"蓝色的",s:"形容词"},"bright":{p:"/braɪt/",m:"明亮的",s:"形容词"},"but":{p:"/bʌt/",m:"但是",s:"连词"},"by":{p:"/baɪ/",m:"被；通过",s:"介词"},
+    "call":{p:"/kɔːl/",m:"叫",s:"动词"},"came":{p:"/keɪm/",m:"来(过去式)",s:"动词"},"can":{p:"/kæn/",m:"能",s:"动词"},"can't":{p:"/kænt/",m:"不能",s:"动词"},"come":{p:"/kʌm/",m:"来",s:"动词"},"could":{p:"/kʊd/",m:"能(过去式)",s:"动词"},"cried":{p:"/kraɪd/",m:"哭了",s:"动词"},
+    "dance":{p:"/dæns/",m:"跳舞",s:"动词"},"dark":{p:"/dɑːrk/",m:"黑暗的",s:"形容词"},"darling":{p:"/ˈdɑːrlɪŋ/",m:"亲爱的",s:"名词"},"day":{p:"/deɪ/",m:"天",s:"名词"},"days":{p:"/deɪz/",m:"日子",s:"名词"},"dear":{p:"/dɪr/",m:"亲爱的",s:"形容词"},"deep":{p:"/diːp/",m:"深的",s:"形容词"},"diamond":{p:"/ˈdaɪmənd/",m:"钻石",s:"名词"},"did":{p:"/dɪd/",m:"做(过去式)",s:"动词"},"didn't":{p:"/ˈdɪdnt/",m:"没有",s:"动词"},"do":{p:"/duː/",m:"做",s:"动词"},"don't":{p:"/doʊnt/",m:"不要",s:"动词"},"down":{p:"/daʊn/",m:"向下",s:"副词"},"dream":{p:"/driːm/",m:"梦",s:"名词"},"dreamed":{p:"/driːmd/",m:"梦见",s:"动词"},
+    "every":{p:"/ˈevri/",m:"每个",s:"形容词"},"everything":{p:"/ˈevriθɪŋ/",m:"一切",s:"代词"},"eyes":{p:"/aɪz/",m:"眼睛",s:"名词"},
+    "face":{p:"/feɪs/",m:"脸",s:"名词"},"far":{p:"/fɑːr/",m:"远的",s:"形容词"},"fear":{p:"/fɪr/",m:"恐惧",s:"名词"},"fears":{p:"/fɪrz/",m:"恐惧(复数)",s:"名词"},"feel":{p:"/fiːl/",m:"感觉",s:"动词"},"find":{p:"/faɪnd/",m:"找到",s:"动词"},"first":{p:"/fɜːrst/",m:"第一",s:"形容词"},"fly":{p:"/flaɪ/",m:"飞",s:"动词"},"for":{p:"/fɔːr/",m:"为了",s:"介词"},"forever":{p:"/fɔːrˈevər/",m:"永远",s:"副词"},"found":{p:"/faʊnd/",m:"找到(过去式)",s:"动词"},"from":{p:"/frʌm/",m:"从",s:"介词"},
+    "go":{p:"/ɡoʊ/",m:"去",s:"动词"},"gone":{p:"/ɡɔːn/",m:"消失的",s:"形容词"},"good":{p:"/ɡʊd/",m:"好的",s:"形容词"},"grace":{p:"/ɡreɪs/",m:"恩典",s:"名词"},"gray":{p:"/ɡreɪ/",m:"灰色的",s:"形容词"},
+    "had":{p:"/hæd/",m:"有(过去式)",s:"动词"},"happy":{p:"/ˈhæpi/",m:"快乐的",s:"形容词"},"has":{p:"/hæz/",m:"有",s:"动词"},"have":{p:"/hæv/",m:"有",s:"动词"},"he":{p:"/hiː/",m:"他",s:"代词"},"head":{p:"/hed/",m:"头",s:"名词"},"hear":{p:"/hɪr/",m:"听见",s:"动词"},"heart":{p:"/hɑːrt/",m:"心",s:"名词"},"held":{p:"/held/",m:"握住(过去式)",s:"动词"},"her":{p:"/hɜːr/",m:"她的",s:"代词"},"here":{p:"/hɪr/",m:"这里",s:"副词"},"high":{p:"/haɪ/",m:"高的",s:"形容词"},"him":{p:"/hɪm/",m:"他(宾格)",s:"代词"},"his":{p:"/hɪz/",m:"他的",s:"代词"},"home":{p:"/hoʊm/",m:"家",s:"名词"},"hope":{p:"/hoʊp/",m:"希望",s:"名词"},"hour":{p:"/ˈaʊər/",m:"小时",s:"名词"},"how":{p:"/haʊ/",m:"怎样；多么",s:"副词"},"hung":{p:"/hʌŋ/",m:"悬挂(过去式)",s:"动词"},
+    "i":{p:"/aɪ/",m:"我",s:"代词"},"i'd":{p:"/aɪd/",m:"我会",s:"缩写"},"i'll":{p:"/aɪl/",m:"我将",s:"缩写"},"i'm":{p:"/aɪm/",m:"我是",s:"缩写"},"i've":{p:"/aɪv/",m:"我已经",s:"缩写"},"if":{p:"/ɪf/",m:"如果",s:"连词"},"in":{p:"/ɪn/",m:"在…里",s:"介词"},"into":{p:"/ˈɪntuː/",m:"进入",s:"介词"},"is":{p:"/ɪz/",m:"是",s:"动词"},"it":{p:"/ɪt/",m:"它",s:"代词"},"it's":{p:"/ɪts/",m:"它是",s:"缩写"},"its":{p:"/ɪts/",m:"它的",s:"代词"},
+    "just":{p:"/dʒʌst/",m:"只是",s:"副词"},
+    "keep":{p:"/kiːp/",m:"保持",s:"动词"},"know":{p:"/noʊ/",m:"知道",s:"动词"},"knew":{p:"/njuː/",m:"知道(过去式)",s:"动词"},
+    "last":{p:"/læst/",m:"最后的",s:"形容词"},"lay":{p:"/leɪ/",m:"躺",s:"动词"},"let":{p:"/let/",m:"让",s:"动词"},"life":{p:"/laɪf/",m:"生命",s:"名词"},"light":{p:"/laɪt/",m:"光",s:"名词"},"like":{p:"/laɪk/",m:"像；喜欢",s:"介词"},"little":{p:"/ˈlɪtl/",m:"小的",s:"形容词"},"live":{p:"/lɪv/",m:"生活",s:"动词"},"long":{p:"/lɔːŋ/",m:"长的",s:"形容词"},"look":{p:"/lʊk/",m:"看",s:"动词"},"lost":{p:"/lɔːst/",m:"迷失的",s:"形容词"},"love":{p:"/lʌv/",m:"爱",s:"名词"},
+    "made":{p:"/meɪd/",m:"做(过去式)",s:"动词"},"make":{p:"/meɪk/",m:"使得",s:"动词"},"man":{p:"/mæn/",m:"男人",s:"名词"},"me":{p:"/miː/",m:"我(宾格)",s:"代词"},"mind":{p:"/maɪnd/",m:"心智",s:"名词"},"mine":{p:"/maɪn/",m:"我的",s:"代词"},"mistaken":{p:"/mɪˈsteɪkən/",m:"弄错的",s:"形容词"},"moon":{p:"/muːn/",m:"月亮",s:"名词"},"more":{p:"/mɔːr/",m:"更多",s:"副词"},"much":{p:"/mʌtʃ/",m:"很多",s:"副词"},"my":{p:"/maɪ/",m:"我的",s:"代词"},
+    "name":{p:"/neɪm/",m:"名字",s:"名词"},"never":{p:"/ˈnevər/",m:"从不",s:"副词"},"night":{p:"/naɪt/",m:"夜晚",s:"名词"},"no":{p:"/noʊ/",m:"不",s:"副词"},"not":{p:"/nɑːt/",m:"不",s:"副词"},"nothing":{p:"/ˈnʌθɪŋ/",m:"什么也没有",s:"代词"},"now":{p:"/naʊ/",m:"现在",s:"副词"},
+    "of":{p:"/ʌv/",m:"…的",s:"介词"},"oh":{p:"/oʊ/",m:"哦",s:"叹词"},"old":{p:"/oʊld/",m:"老的",s:"形容词"},"on":{p:"/ɑːn/",m:"在…上",s:"介词"},"once":{p:"/wʌns/",m:"曾经",s:"副词"},"one":{p:"/wʌn/",m:"一个",s:"数词"},"only":{p:"/ˈoʊnli/",m:"唯一的",s:"形容词"},"or":{p:"/ɔːr/",m:"或者",s:"连词"},"other":{p:"/ˈʌðər/",m:"其他的",s:"形容词"},"our":{p:"/ˈaʊər/",m:"我们的",s:"代词"},"out":{p:"/aʊt/",m:"出去",s:"副词"},"over":{p:"/ˈoʊvər/",m:"在上方",s:"介词"},
+    "please":{p:"/pliːz/",m:"请",s:"副词"},"precious":{p:"/ˈpreʃəs/",m:"珍贵的",s:"形容词"},
+    "rain":{p:"/reɪn/",m:"雨",s:"名词"},"relieved":{p:"/rɪˈliːvd/",m:"释然的",s:"形容词"},
+    "said":{p:"/sed/",m:"说(过去式)",s:"动词"},"saved":{p:"/seɪvd/",m:"拯救了",s:"动词"},"say":{p:"/seɪ/",m:"说",s:"动词"},"see":{p:"/siː/",m:"看见",s:"动词"},"she":{p:"/ʃiː/",m:"她",s:"代词"},"shine":{p:"/ʃaɪn/",m:"闪耀",s:"动词"},"shines":{p:"/ʃaɪnz/",m:"闪耀",s:"动词"},"show":{p:"/ʃoʊ/",m:"展示",s:"动词"},"sky":{p:"/skaɪ/",m:"天空",s:"名词"},"skies":{p:"/skaɪz/",m:"天空(复数)",s:"名词"},"sleeping":{p:"/ˈsliːpɪŋ/",m:"睡着的",s:"形容词"},"so":{p:"/soʊ/",m:"如此",s:"副词"},"some":{p:"/sʌm/",m:"一些",s:"形容词"},"song":{p:"/sɔːŋ/",m:"歌曲",s:"名词"},"soul":{p:"/soʊl/",m:"灵魂",s:"名词"},"sound":{p:"/saʊnd/",m:"声音",s:"名词"},"star":{p:"/stɑːr/",m:"星星",s:"名词"},"still":{p:"/stɪl/",m:"仍然",s:"副词"},"sun":{p:"/sʌn/",m:"太阳",s:"名词"},"sunshine":{p:"/ˈsʌnʃaɪn/",m:"阳光",s:"名词"},"sweet":{p:"/swiːt/",m:"甜的",s:"形容词"},
+    "take":{p:"/teɪk/",m:"拿",s:"动词"},"taught":{p:"/tɔːt/",m:"教(过去式)",s:"动词"},"tell":{p:"/tel/",m:"告诉",s:"动词"},"than":{p:"/ðæn/",m:"比",s:"连词"},"that":{p:"/ðæt/",m:"那个",s:"代词"},"the":{p:"/ðə/",m:"(定冠词)",s:"冠词"},"then":{p:"/ðen/",m:"然后",s:"副词"},"there":{p:"/ðer/",m:"那里",s:"副词"},"they":{p:"/ðeɪ/",m:"他们",s:"代词"},"this":{p:"/ðɪs/",m:"这个",s:"代词"},"those":{p:"/ðoʊz/",m:"那些",s:"代词"},"though":{p:"/ðoʊ/",m:"虽然",s:"连词"},"through":{p:"/θruː/",m:"穿过",s:"介词"},"time":{p:"/taɪm/",m:"时间",s:"名词"},"to":{p:"/tuː/",m:"到",s:"介词"},"today":{p:"/təˈdeɪ/",m:"今天",s:"名词"},"together":{p:"/təˈɡeðər/",m:"一起",s:"副词"},"too":{p:"/tuː/",m:"也",s:"副词"},"true":{p:"/truː/",m:"真的",s:"形容词"},"twinkle":{p:"/ˈtwɪŋkl/",m:"闪烁",s:"动词"},
+    "up":{p:"/ʌp/",m:"向上",s:"副词"},"upon":{p:"/əˈpɑːn/",m:"在…上",s:"介词"},"us":{p:"/ʌs/",m:"我们(宾格)",s:"代词"},
+    "very":{p:"/ˈveri/",m:"非常",s:"副词"},"voice":{p:"/vɔɪs/",m:"声音",s:"名词"},
+    "was":{p:"/wʌz/",m:"是(过去式)",s:"动词"},"way":{p:"/weɪ/",m:"方式",s:"名词"},"we":{p:"/wiː/",m:"我们",s:"代词"},"what":{p:"/wʌt/",m:"什么",s:"代词"},"when":{p:"/wen/",m:"当…时候",s:"连词"},"where":{p:"/wer/",m:"在哪里",s:"副词"},"will":{p:"/wɪl/",m:"将要",s:"动词"},"with":{p:"/wɪð/",m:"和",s:"介词"},"without":{p:"/wɪˈðaʊt/",m:"没有",s:"介词"},"wonder":{p:"/ˈwʌndər/",m:"想知道",s:"动词"},"world":{p:"/wɜːrld/",m:"世界",s:"名词"},"would":{p:"/wʊd/",m:"会",s:"动词"},"wretch":{p:"/retʃ/",m:"可怜的人",s:"名词"},
+    "yeah":{p:"/jeə/",m:"是的",s:"叹词"},"you":{p:"/juː/",m:"你",s:"代词"},"you'll":{p:"/juːl/",m:"你将会",s:"缩写"},"your":{p:"/jʊr/",m:"你的",s:"代词"},"you're":{p:"/jʊr/",m:"你是",s:"缩写"},
+    "'twas":{p:"/twʌz/",m:"那是(=it was)",s:"缩写"}
+    };
+
+    // ==================== JA WORD PARSER ====================
+    function pJW(s){if(!s)return[];return s.split('|').map(p=>{const a=p.split(';');return{w:a[0],r:a[1]||'',m:a[2]||''}});}
+
+    // ==================== SONGS ====================
+    const SONGS=[
+    {title:"Twinkle Twinkle Little Star",tZh:"一闪一闪亮晶晶",artist:"经典童谣",lang:"en",diff:1,emoji:"⭐",color:"#6366f1",
+    lines:[
+    {t:"Twinkle, twinkle, little star,",z:"一闪一闪小星星，"},
+    {t:"How I wonder what you are!",z:"我多想知道你是什么！"},
+    {t:"Up above the world so high,",z:"高高挂在世界上方，"},
+    {t:"Like a diamond in the sky.",z:"就像天空中的钻石。"},
+    {t:"",z:""},
+    {t:"When the blazing sun is gone,",z:"当炽热的太阳落山，"},
+    {t:"When he nothing shines upon,",z:"当它不再照耀万物，"},
+    {t:"Then you show your little light,",z:"你就展示你小小的光，"},
+    {t:"Twinkle, twinkle, through the night.",z:"一闪一闪，穿过夜晚。"}
+    ]},
+    {title:"You Are My Sunshine",tZh:"你是我的阳光",artist:"经典民谣",lang:"en",diff:2,emoji:"☀️",color:"#f59e0b",
+    lines:[
+    {t:"The other night dear, as I lay sleeping,",z:"前几天晚上亲爱的，当我入睡时，"},
+    {t:"I dreamed I held you in my arms.",z:"我梦见我把你抱在怀里。"},
+    {t:"But when I awoke, dear, I was mistaken,",z:"但当我醒来，亲爱的，我搞错了，"},
+    {t:"So I hung my head and I cried.",z:"于是我低下头哭了起来。"},
+    {t:"",z:""},
+    {t:"You are my sunshine, my only sunshine,",z:"你是我的阳光，我唯一的阳光，"},
+    {t:"You make me happy when skies are gray.",z:"当天空灰暗时你让我快乐。"},
+    {t:"You'll never know dear, how much I love you,",z:"你永远不会知道，我有多爱你，"},
+    {t:"Please don't take my sunshine away.",z:"请不要把我的阳光带走。"}
+    ]},
+    {title:"Amazing Grace",tZh:"奇异恩典",artist:"经典赞美诗",lang:"en",diff:3,emoji:"🙏",color:"#8b5cf6",
+    lines:[
+    {t:"Amazing grace, how sweet the sound,",z:"奇异恩典，声音何等甜美，"},
+    {t:"That saved a wretch like me!",z:"竟拯救了像我这样的可怜人！"},
+    {t:"I once was lost, but now am found,",z:"我曾迷失，但如今被找到，"},
+    {t:"Was blind, but now I see.",z:"曾经盲目，但如今我看见。"},
+    {t:"",z:""},
+    {t:"'Twas grace that taught my heart to fear,",z:"是恩典教会我的心敬畏，"},
+    {t:"And grace my fears relieved;",z:"也是恩典缓解了我的恐惧；"},
+    {t:"How precious did that grace appear",z:"那恩典显得多么珍贵啊，"},
+    {t:"The hour I first believed.",z:"在我初次相信的那一刻。"}
+    ]},
+    {title:"きらきら星",tZh:"一闪一闪亮晶晶",artist:"日本童谣",lang:"ja",diff:1,emoji:"🌟",color:"#ec4899",
+    lines:[
+    {t:"きらきら光る お空の星よ",z:"闪闪发光的天空中的星星啊",w:"きらきら;きらきら;闪闪|光る;ひかる;发光|お空;おそら;天空|の;の;的|星;ほし;星星|よ;よ;啊(语气)"},
+    {t:"まばたきしては みんなを見てる",z:"眨着眼看着大家",w:"まばたき;まばたき;眨眼|しては;しては;做着|みんな;みんな;大家|を;を;把(助词)|見てる;みてる;看着"},
+    {t:"きらきら光る お空の星よ",z:"闪闪发光的天空中的星星啊",w:"きらきら;きらきら;闪闪|光る;ひかる;发光|お空;おそら;天空|の;の;的|星;ほし;星星|よ;よ;啊(语气)"},
+    {t:"",z:""},
+    {t:"きらきら光る お空の星よ",z:"闪闪发光的天空中的星星啊",w:"きらきら;きらきら;闪闪|光る;ひかる;发光|お空;おそら;天空|の;の;的|星;ほし;星星|よ;よ;啊(语气)"},
+    {t:"みんなの歌が 届くといいな",z:"希望大家的歌声能传达到",w:"みんな;みんな;大家|の;の;的|歌;うた;歌|が;が;(主语助词)|届く;とどく;传达|と;と;…的话|いい;いい;好|な;な;呢(语气)"},
+    {t:"きらきら光る お空の星よ",z:"闪闪发光的天空中的星星啊",w:"きらきら;きらきら;闪闪|光る;ひかる;发光|お空;おそら;天空|の;の;的|星;ほし;星星|よ;よ;啊(语气)"}
+    ]},
+    {title:"さくらさくら",tZh:"樱花啊樱花",artist:"日本传统民谣",lang:"ja",diff:2,emoji:"🌸",color:"#f472b6",
+    lines:[
+    {t:"さくら さくら",z:"樱花啊 樱花",w:"さくら;さくら;樱花|さくら;さくら;樱花"},
+    {t:"野山も里も",z:"野山和村庄",w:"野山;のやま;野山|も;も;也|里;さと;村庄|も;も;也"},
+    {t:"見渡す限り",z:"放眼望去的尽头",w:"見渡す;みわたす;放眼望去|限り;かぎり;尽头"},
+    {t:"霞か雲か",z:"是霞还是云",w:"霞;かすみ;霞|か;か;还是|雲;くも;云|か;か;吗"},
+    {t:"朝日に匂う",z:"在朝阳中芬芳",w:"朝日;あさひ;朝阳|に;に;在(助词)|匂う;におう;芬芳"},
+    {t:"さくら さくら",z:"樱花啊 樱花",w:"さくら;さくら;樱花|さくら;さくら;樱花"},
+    {t:"花ざかり",z:"花儿正盛开",w:"花ざかり;はなざかり;花盛开"},
+    {t:"",z:""},
+    {t:"さくら さくら",z:"樱花啊 樱花",w:"さくら;さくら;樱花|さくら;さくら;樱花"},
+    {t:"弥生の空は",z:"三月的天空",w:"弥生;やよい;三月(旧称)|の;の;的|空;そら;天空|は;は;(主题助词)"},
+    {t:"見渡す限り",z:"放眼望去的尽头",w:"見渡す;みわたす;放眼望去|限り;かぎり;尽头"},
+    {t:"霞か雲か",z:"是霞还是云",w:"霞;かすみ;霞|か;か;还是|雲;くも;云|か;か;吗"},
+    {t:"匂いぞ出づる",z:"芬芳飘散出来",w:"匂い;におい;芬芳|ぞ;ぞ;(强调)|出づる;いづる;飘散出来"},
+    {t:"いざや いざや",z:"来吧 来吧",w:"いざや;いざや;来吧|いざや;いざや;来吧"},
+    {t:"見にゆかん",z:"一起去看吧",w:"見;み;看|に;に;(目的)|ゆかん;ゆかん;去吧"}
+    ]},
+    {title:"上を向いて歩こう",tZh:"仰头走路吧(昂首向前走)",artist:"坂本九",lang:"ja",diff:3,emoji:"🚶",color:"#a78bfa",
+    lines:[
+    {t:"上を向いて歩こう",z:"仰起头来走吧",w:"上;うえ;上方|を;を;(宾语助词)|向いて;むいて;朝向|歩こう;あるこう;走吧"},
+    {t:"涙がこぼれないように",z:"为了不让眼泪掉下来",w:"涙;なみだ;眼泪|が;が;(主语助词)|こぼれない;こぼれない;不掉落|ように;ように;为了"},
+    {t:"思い出す春の日",z:"回忆起春天的日子",w:"思い出す;おもいだす;回忆起|春;はる;春天|の;の;的|日;ひ;日子"},
+    {t:"一人ぼっちの夜",z:"孤单一人的夜晚",w:"一人ぼっち;ひとりぼっち;孤单一人|の;の;的|夜;よる;夜晚"},
+    {t:"",z:""},
+    {t:"上を向いて歩こう",z:"仰起头来走吧",w:"上;うえ;上方|を;を;(宾语助词)|向いて;むいて;朝向|歩こう;あるこう;走吧"},
+    {t:"にじんだ星を数えて",z:"数着模糊的星星",w:"にじんだ;にじんだ;模糊的|星;ほし;星星|を;を;(宾语助词)|数えて;かぞえて;数着"},
+    {t:"思い出す夏の日",z:"回忆起夏天的日子",w:"思い出す;おもいだす;回忆起|夏;なつ;夏天|の;の;的|日;ひ;日子"},
+    {t:"一人ぼっちの夜",z:"孤单一人的夜晚",w:"一人ぼっち;ひとりぼっち;孤单一人|の;の;的|夜;よる;夜晚"},
+    {t:"",z:""},
+    {t:"幸せは雲の上に",z:"幸福在云的上方",w:"幸せ;しあわせ;幸福|は;は;(主题助词)|雲;くも;云|の;の;的|上;うえ;上方|に;に;在"},
+    {t:"幸せは空の上に",z:"幸福在天空的上方",w:"幸せ;しあわせ;幸福|は;は;(主题助词)|空;そら;天空|の;の;的|上;うえ;上方|に;に;在"},
+    {t:"上を向いて歩こう",z:"仰起头来走吧",w:"上;うえ;上方|を;を;(宾语助词)|向いて;むいて;朝向|歩こう;あるこう;走吧"},
+    {t:"涙がこぼれないように",z:"为了不让眼泪掉下来",w:"涙;なみだ;眼泪|が;が;(主语助词)|こぼれない;こぼれない;不掉落|ように;ように;为了"},
+    {t:"泣きながら歩く",z:"一边哭一边走",w:"泣き;なき;哭泣|ながら;ながら;一边…一边|歩く;あるく;走"},
+    {t:"一人ぼっちの夜",z:"孤单一人的夜晚",w:"一人ぼっち;ひとりぼっち;孤单一人|の;の;的|夜;よる;夜晚"}
+    ]}
+    ];
+
+    // ==================== STATE ====================
+    let st={
+      tab:'library', songIdx:null, customLines:null, customLang:'en',
+      selectedWord:null, curLang:null,
+      showSentTrans:true, showWordTrans:false, showPhonetic:false,
+      practiceMode:false, slowMode:false,
+      vocab:[], revealedBlanks:new Set(),
+      libFilter:'all',
+      learningSource:'library'
+    };
+
+    // ==================== SPEECH ====================
+    function speak(text,slow,lang){
+      if(!('speechSynthesis' in window))return;
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text);
+      const l=lang||st.curLang||'en';
+      u.lang=l==='ja'?'ja-JP':'en-US';
+      u.rate=(slow||st.slowMode)?0.5:(l==='ja'?0.78:0.82);u.pitch=1;
+      speechSynthesis.speak(u);
+    }
+
+    // ==================== UTILS ====================
+    function cw(w){return w.replace(/[.,!?;:'"()\[\]—–…""''、。！？「」『』]/g,'').toLowerCase().trim();}
+    function lookupEN(w){return D[cw(w)]||null;}
+    function inVocab(w,lang){return st.vocab.some(v=>v.word===w && v.lang===(lang||st.curLang));}
+    function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+    function diffStars(n){return '⭐'.repeat(n);}
+
+    let jaWordMap={};
+    function buildJaMap(song){
+      jaWordMap={};
+      if(song.lang!=='ja')return;
+      song.lines.forEach(l=>{
+        if(!l.w)return;
+        pJW(l.w).forEach(wd=>{if(wd.w&&!jaWordMap[wd.w])jaWordMap[wd.w]=wd;});
+      });
+    }
+    function lookupJA(w){return jaWordMap[w]||null;}
+
+    // ==================== LOCAL STORAGE FOR CUSTOM SONGS ====================
+    const SAVED_KEY = 'savedCustomSongs_v2';
+    function getSavedSongs(){
+      try{return JSON.parse(localStorage.getItem(SAVED_KEY))||[];}catch(e){return[];}
+    }
+    function saveSongsToStorage(songs){
+      localStorage.setItem(SAVED_KEY, JSON.stringify(songs));
+    }
+
+    function saveCurrentCustom(){
+      if(!st.customLines || !st.customLines.length) return;
+      const lines = st.customLines;
+      const lang = st.customLang;
+      const firstLine = lines.find(l=>l.t && l.t.trim())?.t || '未命名';
+      const cleanFirst = firstLine.replace(/\{[^}]*\}/g,'').replace(/\s+/g,' ').trim();
+      const title = cleanFirst.slice(0, 30) + (cleanFirst.length > 30 ? '…' : '');
+      const saved = getSavedSongs();
+      const exists = saved.some(s => s.title === title && s.lang === lang && s.lines.length === lines.length);
+      if(exists){
+        alert('⚠️ 这首歌似乎已经保存过了。');
+        return;
+      }
+      saved.push({ id: Date.now(), title: title, lang: lang, lines: lines });
+      saveSongsToStorage(saved);
+      alert('✅ 歌曲已保存！可到“歌曲库”查看。');
+      render();
+    }
+
+    function deleteCustomSong(id){
+      if(!confirm('确定要删除这首歌吗？')) return;
+      const saved = getSavedSongs().filter(s => s.id !== id);
+      saveSongsToStorage(saved);
+      render();
+    }
+
+    function loadCustomSongById(id){
+      const song = getSavedSongs().find(s => s.id === id);
+      if(!song) return;
+      st.customLines = song.lines;
+      st.customLang = song.lang;
+      st.songIdx = null;
+      st.learningSource = 'library';
+      st.practiceMode = false;
+      st.revealedBlanks.clear();
+      if(st.customLang==='ja'){
+        jaWordMap={};
+        st.customLines.forEach(l=>{
+          if(l.w && Array.isArray(l.w)){
+            l.w.forEach(wd=>{if(wd.w && wd.r && !jaWordMap[wd.w]) jaWordMap[wd.w]=wd;});
+          }
+        });
+      }
+      render();
+    }
+
+    // ==================== RENDER ====================
+    function render(){
+      const tabsEl=document.getElementById('tabs');
+      const td=[{id:'library',l:'🎵 歌曲库'},{id:'custom',l:'✏️ 自定义'},{id:'vocab',l:`📚 生词(${st.vocab.length})`}];
+      tabsEl.innerHTML=td.map(t=>`<button class="tab ${st.tab===t.id?'active':''}" onclick="switchTab('${t.id}')">${t.l}</button>`).join('');
+      const main=document.getElementById('main');
+      if(st.tab==='library'&&st.songIdx===null&&!st.customLines) main.innerHTML=renderLibrary();
+      else if(st.tab==='custom'&&!st.customLines) main.innerHTML=renderCustom();
+      else if(st.tab==='vocab') main.innerHTML=renderVocab();
+      else main.innerHTML=renderLyrics();
+      document.getElementById('speedBtn').className='speed-btn'+(st.slowMode?' active':'');
+      document.getElementById('speedBtn').textContent=st.slowMode?'🐢 慢速中':'🐢 慢速';
+    }
+
+    function getCombinedSongs(){
+      const builtin = SONGS.map((s,i)=>({...s, type:'builtin', index:i}));
+      const custom = getSavedSongs().map(s=>({
+        title:s.title, tZh:'自定义', artist:'我的保存', lang:s.lang, diff:0, emoji:'💾', color:'#fbbf24',
+        lines:s.lines, type:'custom', id:s.id
+      }));
+      return [...builtin, ...custom];
+    }
+
+    function renderLibrary(){
+      const allSongs = getCombinedSongs();
+      const filtered = allSongs.filter(s => st.libFilter==='all' || s.lang===st.libFilter);
+      return `<div class="section-title">📂 选择一首歌曲开始学习</div>
+      <div class="lang-filters">
+        <button class="lang-filter ${st.libFilter==='all'?'active':''}" onclick="setFilter('all')">🌐 全部</button>
+        <button class="lang-filter ${st.libFilter==='en'?'active':''}" onclick="setFilter('en')">🇺🇸 英语</button>
+        <button class="lang-filter ${st.libFilter==='ja'?'active':''}" onclick="setFilter('ja')">🇯🇵 日语</button>
+      </div>
+      <div class="song-grid">${filtered.map(s=>`
+        <div class="song-card ${s.type==='custom'?'custom':''}" style="${s.type==='custom'?'':'border-left:3px solid '+s.color}" data-custom-id="${s.type==='custom'?s.id:''}" data-builtin-index="${s.type==='builtin'?s.index:''}">
+          <div style="font-size:1.6em;margin-bottom:4px">${s.emoji}</div>
+          <div class="song-title-card">${s.title}<span class="lang-badge ${s.lang}">${s.lang==='ja'?'日本語':'EN'}</span></div>
+          <div class="song-artist">${s.tZh} · ${s.artist}</div>
+          <div class="song-meta"><span>${s.type==='custom'?'自定义':diffStars(s.diff)}</span><span>${s.lines.filter(l=>l.t).length}行</span></div>
+          ${s.type==='custom'?`<div class="card-actions"><button class="del-card-btn" onclick="event.stopPropagation();deleteCustomSong(${s.id})" title="删除">✕</button></div>`:''}
+        </div>`).join('')}</div>`;
+    }
+
+    function renderCustom(){
+      return `<div class="custom-area">
+        <div class="section-title">✏️ 粘贴歌词，支持英语和日语（用 <code>|</code> 分隔原文和翻译）</div>
+        <div class="custom-lang-toggle">
+          <button class="cl-btn ${st.customLang==='en'?'active':''}" onclick="st.customLang='en';render()">🇺🇸 英语歌词</button>
+          <button class="cl-btn ${st.customLang==='ja'?'active':''}" onclick="st.customLang='ja';render()">🇯🇵 日语歌词</button>
+        </div>
+        ${st.customLang==='en'?`
+        <div class="format-box">
+          <div class="format-title">📌 英语歌词格式</div>
+          <div style="color:var(--text2);margin-bottom:4px">每行一句，用 <code>|</code> 分隔英文和中文翻译：</div>
+          <div class="format-ex">Let it be, let it be | 顺其自然<br>Whisper words of wisdom | 轻声说出智慧的话语</div>
+          <div style="color:var(--text3);margin-top:4px;font-size:.9em">💡 不写翻译也可以，但不会显示句子翻译。</div>
+        </div>`:`
+        <div class="format-box">
+          <div class="format-title">📌 日语歌词格式</div>
+          <div style="color:var(--text2);margin-bottom:4px">每行一句，<b>单词之间用空格分开</b>，用 <code>|</code> 分隔日文和中文翻译。</div>
+          <div style="color:var(--text2);margin-bottom:4px">可用 <code>{读音,释义}</code> 标注单词：</div>
+          <div class="format-ex">上{うえ,上方}を 向いて{むいて,朝向} 歩こう{あるこう,走吧} | 仰起头来走吧<br>涙{なみだ,眼泪}が こぼれない ように | 为了不让眼泪掉下来</div>
+          <div style="color:var(--text3);margin-top:4px;font-size:.9em">💡 不写标注也可以，空格分词即可点击学习每个词。</div>
+        </div>`}
+        <textarea class="custom-textarea" id="customText" placeholder="${st.customLang==='en'?'粘贴英文歌词...\n\nLet it be | 顺其自然':'粘贴日语歌词（用空格分词）...\n\nきらきら 光る{ひかる,发光} | 闪闪发光'}"></textarea>
+        <button class="wp-btn primary custom-submit" onclick="startCustom()">🚀 开始学习</button>
+      </div>`;
+    }
+
+    function renderLyrics(){
+      let song,lines,title,lang,isCustom=false;
+      if(st.customLines){
+        lines=st.customLines; title='📝 自定义歌词'; lang=st.customLang; isCustom=true;
+      } else {
+        song=SONGS[st.songIdx]; lines=song.lines; title=(song.lang==='ja'?'🎵 ':'🎵 ')+song.title; lang=song.lang;
+        buildJaMap(song);
+      }
+      st.curLang=lang;
+      const isJA=lang==='ja';
+      const readingLabel=isJA?'📝 假名注音':'📝 音标';
+
+      let html=`<div class="lyrics-header">
+        <button class="back-btn" onclick="goBack()">← 返回</button>
+        <div class="lyrics-song-title">${title} <span class="lang-badge ${lang}">${isJA?'日本語':'EN'}</span></div>
+        ${isCustom ? `<button class="save-song-btn" onclick="saveCurrentCustom()">💾 保存到歌曲库</button>` : ''}
+      </div>
+      <div class="lyrics-controls">
+        <button class="ctrl-btn ${st.showSentTrans?'on':''}" onclick="toggle('showSentTrans')">📖 句子翻译</button>
+        <button class="ctrl-btn ${st.showWordTrans?'on':''}" onclick="toggle('showWordTrans')">🔤 逐字翻译</button>
+        <button class="ctrl-btn ${st.showPhonetic?'on':''}" onclick="toggle('showPhonetic')">${readingLabel}</button>
+        <button class="ctrl-btn ${st.practiceMode?'on':''}" onclick="toggle('practiceMode')">🧩 练习</button>
+        <button class="ctrl-btn" onclick="speakAll()">🔊 朗读全文</button>
+      </div><div>`;
+
+      lines.forEach((line,li)=>{
+        if(!line.t){html+='<div style="height:8px"></div>';return;}
+        html+=`<div class="lyric-line" style="animation-delay:${li*0.04}s">`;
+        if(isJA) html+=renderJALine(line,li,isCustom);
+        else html+=renderENLine(line,li,isCustom);
+        if(st.showSentTrans){
+          if(line.z) html+=`<div class="line-zh"><span class="label">🇨🇳</span>${line.z}</div>`;
+          else if(isCustom) html+=`<div class="line-zh" style="opacity:.5;font-style:italic"><span class="label">📝</span>未提供翻译</div>`;
+        }
+        html+=`</div>`;
+      });
+      html+=`</div>`;
+      return html;
+    }
+
+    function renderENLine(line,li,isCustom){
+      const words=line.t.split(/\s+/).filter(Boolean);
+      let h='';
+      if(st.showWordTrans||st.showPhonetic){
+        h+=`<div class="line-en interlinear"><span class="line-play il-play" onclick="speakLine(\`${esc(line.t)}\`,'en')">▶</span>`;
+        words.forEach((w,wi)=>{
+          const c=cw(w),info=D[c],iv=inVocab(c,'en');
+          const isBlank=st.practiceMode&&iv;
+          const revealed=st.revealedBlanks.has(`${li}-${wi}`);
+          let cls='wg'+(iv?' in-vocab':'')+(isBlank&&!revealed?' blank-wg':'')+(isBlank&&revealed?' blank-wg revealed':'');
+          h+=`<div class="${cls}" onclick="${isBlank&&!revealed?`revealBlank(${li},${wi},'${esc(c)}','en')`:`selectWordEN('${esc(c)}')`}"><span class="wg-en">${w}</span>`;
+          if(st.showPhonetic) h+=`<span class="wg-ph">${info?info.p:'·'}</span>`;
+          if(st.showWordTrans) h+=`<span class="wg-zh ${info?'':'wg-unknown'}">${info?info.m:'?'}</span>`;
+          h+=`</div>`;
+        });
+        h+=`</div>`;
+      } else {
+        h+=`<div class="line-en"><span class="line-play" onclick="speakLine(\`${esc(line.t)}\`,'en')">▶</span>`;
+        words.forEach((w,wi)=>{
+          const c=cw(w),iv=inVocab(c,'en');
+          const isBlank=st.practiceMode&&iv;
+          const revealed=st.revealedBlanks.has(`${li}-${wi}`);
+          let cls='word';
+          if(iv&&!st.practiceMode) cls+=' in-vocab';
+          if(isBlank&&!revealed) cls+=' blank';
+          if(isBlank&&revealed) cls+=' blank revealed';
+          if(isBlank&&!revealed) h+=`<span class="${cls}" onclick="revealBlank(${li},${wi},'${esc(c)}','en')">${w}</span> `;
+          else h+=`<span class="${cls}" onclick="selectWordEN('${esc(c)}')">${w}</span> `;
+        });
+        h+=`</div>`;
+      }
+      return h;
+    }
+
+    function renderJALine(line,li,isCustom){
+      let wds=[];
+      if(line.w && typeof line.w==='string') wds=pJW(line.w);
+      else if(line.w && Array.isArray(line.w)) wds=line.w;
+      else {
+        const parts=line.t.split(/\s+/).filter(Boolean);
+        wds=parts.map(p=>{
+          const m=p.match(/^(.+?)\{([^}]*)\}$/);
+          if(m){const ann=m[2].split(',');return{w:m[1],r:ann[0]||'',m:ann[1]||''};}
+          const info=jaWordMap[p];
+          if(info) return info;
+          return{w:p,r:'',m:''};
+        });
+      }
+      let h='';
+      if(st.showWordTrans||st.showPhonetic){
+        h+=`<div class="line-en interlinear"><span class="line-play il-play" onclick="speakLine(\`${esc(line.t.replace(/\{[^}]*\}/g,''))}\`,'ja')">▶</span>`;
+        wds.forEach((wd,wi)=>{
+          const iv=inVocab(wd.w,'ja');
+          const isBlank=st.practiceMode&&iv;
+          const revealed=st.revealedBlanks.has(`${li}-${wi}`);
+          let cls='wg'+(iv?' in-vocab':'')+(isBlank&&!revealed?' blank-wg':'')+(isBlank&&revealed?' blank-wg revealed':'');
+          h+=`<div class="${cls}" onclick="${isBlank&&!revealed?`revealBlankJA(${li},${wi},'${esc(wd.w)}')`:`selectWordJA('${esc(wd.w)}','${esc(wd.r)}','${esc(wd.m)}')`}">`;
+          if(st.showPhonetic&&wd.r) h+=`<span class="wg-rd">${wd.r}</span>`;
+          h+=`<span class="wg-en ja-word">${wd.w}</span>`;
+          if(st.showWordTrans) h+=`<span class="wg-zh ${wd.m?'':'wg-unknown'}">${wd.m||'·'}</span>`;
+          h+=`</div>`;
+        });
+        h+=`</div>`;
+      } else {
+        h+=`<div class="line-en"><span class="line-play" onclick="speakLine(\`${esc(line.t.replace(/\{[^}]*\}/g,''))}\`,'ja')">▶</span>`;
+        wds.forEach((wd,wi)=>{
+          const iv=inVocab(wd.w,'ja');
+          const isBlank=st.practiceMode&&iv;
+          const revealed=st.revealedBlanks.has(`${li}-${wi}`);
+          let cls='word ja-word';
+          if(iv&&!st.practiceMode) cls+=' in-vocab';
+          if(isBlank&&!revealed) cls+=' blank';
+          if(isBlank&&revealed) cls+=' blank revealed';
+          if(isBlank&&!revealed) h+=`<span class="${cls}" onclick="revealBlankJA(${li},${wi},'${esc(wd.w)}')">${wd.w}</span> `;
+          else h+=`<span class="${cls}" onclick="selectWordJA('${esc(wd.w)}','${esc(wd.r)}','${esc(wd.m)}')">${wd.w}</span> `;
+        });
+        h+=`</div>`;
+      }
+      return h;
+    }
+
+    function renderVocab(){
+      if(!st.vocab.length) return `<div class="vocab-empty"><span class="icon">📚</span><div style="font-size:1.05em;margin-bottom:6px">生词本是空的</div><div style="font-size:.82em">学习歌曲时，点击单词并收藏到生词本</div></div>`;
+      return `<div class="vocab-header"><div class="section-title" style="margin:0">📚 我的生词本</div><div style="display:flex;gap:8px;align-items:center"><span class="vocab-count">${st.vocab.length} 个单词</span><button class="flashcard-btn" onclick="startFC()">🃏 闪卡复习</button></div></div>
+      <div class="vocab-list">${st.vocab.map((v,i)=>`
+        <div class="vocab-item">
+          <div class="vocab-word">${v.word} <span class="lang-badge ${v.lang}" style="font-size:.6em">${v.lang==='ja'?'JP':'EN'}</span></div>
+          <div class="vocab-info">
+            ${v.lang==='ja'&&v.reading?`<div class="vocab-reading">${v.reading}</div>`:''}
+            ${v.lang==='en'&&v.phonetic?`<div class="vocab-phonetic">${v.phonetic}</div>`:''}
+            <div class="vocab-meaning">${v.meaning||'(未收录)'}</div>
+          </div>
+          <div class="vocab-actions">
+            <button class="vocab-btn" onclick="speak('${esc(v.word)}',false,'${v.lang}')">🔊</button>
+            <button class="vocab-btn del" onclick="removeVocab(${i})">✕</button>
+          </div>
+        </div>`).join('')}</div>`;
+    }
+
+    // ==================== WORD PANEL ====================
+    function openWP_EN(word){
+      const info=D[word];
+      const iv=inVocab(word,'en');
+      document.getElementById('wpContent').innerHTML=`
+        <div class="wp-header"><div>
+          <div class="wp-word">${word}</div>
+          ${info?`<div class="wp-phonetic">${info.p}</div><span class="wp-pos">${info.s}</span>`:`<div class="wp-phonetic" style="color:var(--text3)">词典暂未收录</div>`}
+        </div><button class="wp-close" onclick="closeWordPanel()">✕</button></div>
+        ${info?`<div class="wp-meaning">🇨🇳 ${info.m}</div>`:'<div class="wp-meaning" style="border-color:var(--text3)">暂无释义</div>'}
+        <div class="wp-actions">
+          <button class="wp-btn primary" onclick="speak('${esc(word)}',false,'en')">🔊 发音</button>
+          <button class="wp-btn" onclick="speak('${esc(word)}',true,'en')">🐢 慢读</button>
+          ${!iv?`<button class="wp-btn" onclick="addVocabEN('${esc(word)}')" style="border-color:var(--green);color:var(--green)">⭐ 收藏</button>`
+              :`<button class="wp-btn danger" onclick="rmVocabW('${esc(word)}','en')">✕ 移出</button>`}
+        </div>`;
+      showPanel();
+    }
+
+    function openWP_JA(word,reading,meaning){
+      const iv=inVocab(word,'ja');
+      if(!reading||!meaning){const info=lookupJA(word);if(info){reading=reading||info.r;meaning=meaning||info.m;}}
+      document.getElementById('wpContent').innerHTML=`
+        <div class="wp-header"><div>
+          <div class="wp-word">${word}</div>
+          ${reading?`<div class="wp-reading">【${reading}】</div>`:''}
+        </div><button class="wp-close" onclick="closeWordPanel()">✕</button></div>
+        ${meaning?`<div class="wp-meaning">🇨🇳 ${meaning}</div>`:'<div class="wp-meaning" style="border-color:var(--text3)">暂无释义，点击发音听读音</div>'}
+        <div class="wp-actions">
+          <button class="wp-btn primary" onclick="speak('${esc(word)}',false,'ja')">🔊 发音</button>
+          <button class="wp-btn" onclick="speak('${esc(word)}',true,'ja')">🐢 慢读</button>
+          ${!iv?`<button class="wp-btn" onclick="addVocabJA('${esc(word)}','${esc(reading)}','${esc(meaning)}')" style="border-color:var(--green);color:var(--green)">⭐ 收藏</button>`
+              :`<button class="wp-btn danger" onclick="rmVocabW('${esc(word)}','ja')">✕ 移出</button>`}
+        </div>`;
+      showPanel();
+    }
+
+    function showPanel(){document.getElementById('wordPanel').classList.add('open');document.getElementById('overlay').classList.add('show');}
+    function closeWordPanel(){document.getElementById('wordPanel').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+    // ==================== FLASHCARD ====================
+    let fc={idx:0,show:false};
+    function startFC(){if(!st.vocab.length)return;fc={idx:0,show:false};renderFC();}
+    function renderFC(){
+      const v=st.vocab[fc.idx];
+      let el=document.getElementById('fcOverlay');
+      if(!el){el=document.createElement('div');el.id='fcOverlay';el.className='fc-overlay';document.body.appendChild(el);}
+      el.style.display='flex';
+      const isJA=v.lang==='ja';
+      el.innerHTML=`<div class="fc-card">
+        <button class="fc-close" onclick="closeFC()">✕</button>
+        <div class="fc-progress">${fc.idx+1}/${st.vocab.length}</div>
+        <div class="fc-word">${v.word} <span class="lang-badge ${v.lang}" style="font-size:.4em;vertical-align:middle">${isJA?'JP':'EN'}</span></div>
+        ${isJA&&v.reading?`<div class="fc-reading">【${v.reading}】</div>`:''}
+        ${!isJA&&v.phonetic?`<div class="fc-phonetic">${v.phonetic}</div>`:''}
+        <div class="fc-meaning">${fc.show?(v.meaning||'无释义'):'点击按钮查看释义'}</div>
+        <div class="fc-btns">
+          <button class="fc-btn" onclick="speak('${esc(v.word)}',false,'${v.lang}')">🔊</button>
+          ${!fc.show?`<button class="fc-btn primary" onclick="fc.show=true;renderFC()">👀 查看</button>`
+                  :`<button class="fc-btn primary" onclick="fc.idx=(fc.idx+1)%st.vocab.length;fc.show=false;renderFC()">→ 下一个</button>`}
+        </div></div>`;
+    }
+    function closeFC(){const el=document.getElementById('fcOverlay');if(el)el.style.display='none';}
+
+    // ==================== ACTIONS ====================
+    window.switchTab = function(tab){
+      st.tab=tab;
+      if(tab==='library'){ st.songIdx=null; st.customLines=null; st.learningSource='library'; }
+      if(tab==='custom'){ st.songIdx=null; }
+      if(tab==='vocab'){ st.songIdx=null; st.customLines=null; }
+      st.practiceMode=false; st.revealedBlanks.clear();
+      closeWordPanel(); render();
+    };
+    window.setFilter = function(f){st.libFilter=f;render();};
+    window.selectSong = function(i){
+      st.songIdx=i; st.customLines=null; st.learningSource='library';
+      st.practiceMode=false; st.revealedBlanks.clear();
+      if(SONGS[i].lang==='ja') buildJaMap(SONGS[i]);
+      render();
+    };
+    window.startCustom = function(){
+      const t=document.getElementById('customText').value.trim();
+      if(!t)return;
+      if(st.customLang==='ja'){
+        st.customLines=t.split('\n').map(line=>{
+          const parts=line.split('|');
+          const raw=(parts[0]||'').trim();
+          const zh=(parts[1]||'').trim();
+          const wds=raw.split(/\s+/).filter(Boolean).map(p=>{
+            const m=p.match(/^(.+?)\{([^}]*)\}$/);
+            if(m){const ann=m[2].split(',');return{w:m[1],r:ann[0]||'',m:ann[1]||''};}
+            return{w:p,r:'',m:''};
+          });
+          const cleanText=raw.replace(/\{[^}]*\}/g,'');
+          return{t:cleanText,z:zh,w:wds};
+        });
+      } else {
+        st.customLines=t.split('\n').map(line=>{
+          const parts=line.split('|');
+          return{t:(parts[0]||'').trim(),z:(parts[1]||'').trim()};
+        });
+      }
+      st.songIdx=null; st.learningSource='custom';
+      st.practiceMode=false; st.revealedBlanks.clear();
+      if(st.customLang==='ja'){
+        jaWordMap={};
+        st.customLines.forEach(l=>{
+          if(l.w && Array.isArray(l.w)){
+            l.w.forEach(wd=>{if(wd.w && wd.r && !jaWordMap[wd.w]) jaWordMap[wd.w]=wd;});
+          }
+        });
+      }
+      render();
+    };
+    window.goBack = function(){
+      if(st.learningSource==='library'){
+        st.songIdx=null; st.customLines=null;
+        st.tab='library';
+      } else {
+        st.tab='custom';
+      }
+      st.practiceMode=false; st.revealedBlanks.clear();
+      closeWordPanel(); render();
+    };
+    window.selectWordEN = function(word){speak(word,false,'en');openWP_EN(word);};
+    window.selectWordJA = function(word,reading,meaning){speak(word,false,'ja');openWP_JA(word,reading,meaning);};
+    window.toggle = function(key){
+      if(key==='practiceMode'){st.practiceMode=!st.practiceMode;st.revealedBlanks.clear();}
+      else st[key]=!st[key];
+      render();
+    };
+    window.toggleSpeed = function(){st.slowMode=!st.slowMode;render();};
+    window.revealBlank = function(li,wi,word,lang){st.revealedBlanks.add(`${li}-${wi}`);speak(word,false,lang);openWP_EN(word);render();};
+    window.revealBlankJA = function(li,wi,word){st.revealedBlanks.add(`${li}-${wi}`);const info=lookupJA(word);speak(word,false,'ja');openWP_JA(word,info?info.r:'',info?info.m:'');render();};
+    window.speakLine = function(t,lang){speak(t,false,lang);};
+    window.speakAll = function(){
+      let lines=st.customLines||(st.songIdx!==null?SONGS[st.songIdx].lines:[]);
+      const lang=st.curLang||(st.songIdx!==null?SONGS[st.songIdx].lang:'en');
+      const text=lines.map(l=>(l.t||'').replace(/\{[^}]*\}/g,'')).filter(Boolean).join(lang==='ja'?'。':'. ');
+      speak(text,false,lang);
+    };
+    window.addVocabEN = function(word){if(inVocab(word,'en'))return;const info=D[word]||{};st.vocab.push({word,phonetic:info.p||'',reading:'',meaning:info.m||'',lang:'en'});openWP_EN(word);render();};
+    window.addVocabJA = function(word,reading,meaning){if(inVocab(word,'ja'))return;st.vocab.push({word,phonetic:'',reading:reading||'',meaning:meaning||'',lang:'ja'});openWP_JA(word,reading,meaning);render();};
+    window.removeVocab = function(i){st.vocab.splice(i,1);render();};
+    window.rmVocabW = function(word,lang){
+      st.vocab=st.vocab.filter(v=>!(v.word===word&&v.lang===lang));
+      if(lang==='en')openWP_EN(word);
+      else{const info=lookupJA(word);openWP_JA(word,info?info.r:'',info?info.m:'');}
+      render();
+    };
+
+    document.addEventListener('click', function(e){
+      const card = e.target.closest('.song-card');
+      if(!card || !card.parentNode.classList.contains('song-grid')) return;
+      const customId = card.dataset.customId;
+      if(customId){
+        loadCustomSongById(Number(customId));
+        return;
+      }
+      const builtinIndex = card.dataset.builtinIndex;
+      if(builtinIndex !== undefined){
+        selectSong(Number(builtinIndex));
+      }
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>
